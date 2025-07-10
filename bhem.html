@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Modern LMS</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body 
+     {
+  font-family: 'Segoe UI', sans-serif;
+  background: url("what.jpg") no-repeat center center fixed;
+  background-size: cover;
+  margin: 0;
+  padding: 20px;
+  color: #333;
+  transition: background 0.5s ease;
+
+    }
+
+    .fade {
+      animation: fadeIn 0.7s ease-in-out;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    #app, #progressPage {
+      max-width: 800px;
+      margin: auto;
+      padding: 30px;
+      border-radius: 15px;
+      box-shadow: 0 4px 25px rgba(0, 0, 0, 0.08);
+    }
+
+    h1, h2, h3 {
+      color: #6d4c41;
+    }
+
+    input, select, textarea, button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #ddd;
+      font-size: 1rem;
+      box-sizing: border-box;
+    }
+
+    button {
+      background-color: #d7a97b;
+      color: white;
+      font-weight: bold;
+      border: none;
+      margin-top: 15px;
+      transition: background 0.3s;
+    }
+
+    button:hover {
+      background-color: #b58256;
+    }
+
+    .section {
+      margin-bottom: 30px;
+    }
+
+    .course-item {
+      background: #fdf6f1;
+      border: 1px solid #e2d5cc;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .hidden {
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="fade">
+    <h1>🌱 Learning Management System</h1>
+
+    <!-- Registration -->
+    <div id="register" class="section">
+      <h2>Register</h2>
+      <input type="text" id="regUsername" placeholder="Username">
+      <input type="password" id="regPassword" placeholder="Password">
+      <select id="regRole">
+        <option value="student">Student</option>
+        <option value="instructor">Instructor</option>
+        <option value="admin">Admin</option>
+      </select>
+      <button onclick="register()">Register</button>
+    </div>
+
+    <!-- Login -->
+    <div id="auth" class="section">
+      <h2>Login</h2>
+      <input type="text" id="username" placeholder="Username">
+      <input type="password" id="password" placeholder="Password">
+      <button onclick="login()">Login</button>
+    </div>
+
+    <!-- Instructor Course Creation -->
+    <div id="courseCreation" class="section hidden">
+      <h2>Create Course</h2>
+      <input type="text" id="courseTitle" placeholder="Course Title">
+      <textarea id="courseContent" placeholder="Course Content"></textarea>
+      <input type="file" id="courseFile">
+      <button onclick="createCourse()">Create Course</button>
+      <h3>Your Courses</h3>
+      <ul id="instructorCourses"></ul>
+    </div>
+
+    <!-- Student View -->
+    <div id="courseList" class="section hidden">
+      <h2>Available Courses</h2>
+      <ul id="courses"></ul>
+    </div>
+
+    <!-- Quiz -->
+<!-- This is an updated version of your HTML file with support for multiple quizzes -->
+<!-- Add this in place of the existing "Quiz" section -->
+<!-- This assumes the rest of your HTML (registration, login, etc.) remains unchanged -->
+
+<!-- Quiz Selector -->
+<div id="assessment" class="section hidden">
+  <h2>📚 Take a Quiz</h2>
+  <label>Select Quiz:</label>
+  <select id="quizSelector" onchange="loadQuiz()">
+    <option value="">-- Select --</option>
+    <option value="quiz1">Computer Science Concepts</option>
+    <option value="quiz2">Web Development</option>
+    <option value="quiz3">Python Programming</option>
+    <option value="quiz4">AI Concepts</option>
+  </select>
+
+  <form id="quizForm" class="hidden">
+    <div id="quizQuestions"></div>
+    <button type="button" onclick="submitQuiz()">Submit Quiz</button>
+  </form>
+  <p id="quizResult"></p>
+</div>
+
+<script>
+const quizzes = {
+  quiz1: [
+    { q: "What is the time complexity of binary search?", a: "o(log n)", id: "q1" },
+    { q: "Which data structure uses FIFO order?", a: "queue", id: "q2" },
+    { q: "What does CPU stand for?", a: "central processing unit", id: "q3" },
+    { q: "What is the output of 2**3 in Python?", a: "8", id: "q4" },
+    { q: "What is the full form of DBMS?", a: "database management system", id: "q5" }
+  ],
+  quiz2: [
+    { q: "What does HTML stand for?", a: "hypertext markup language", id: "q1" },
+    { q: "Which tag is used to insert an image in HTML?", a: "img", id: "q2" },
+    { q: "Which property is used in CSS for background color?", a: "background-color", id: "q3" },
+    { q: "Which language is used for styling web pages?", a: "css", id: "q4" },
+    { q: "What does DOM stand for?", a: "document object model", id: "q5" }
+  ],
+  quiz3: [
+    { q: "Which keyword is used to define a function in Python?", a: "def", id: "q1" },
+    { q: "Which data type is used to store True or False?", a: "boolean", id: "q2" },
+    { q: "What does PEP stand for in Python?", a: "python enhancement proposal", id: "q3" },
+    { q: "What is the result of 10//3 in Python?", a: "3", id: "q4" },
+    { q: "Which Python module is used for regular expressions?", a: "re", id: "q5" }
+  ],
+  quiz4: [
+    { q: "What does AI stand for?", a: "artificial intelligence", id: "q1" },
+    { q: "Which algorithm is used in supervised learning?", a: "linear regression", id: "q2" },
+    { q: "Which is a type of neural network?", a: "cnn", id: "q3" },
+    { q: "What does NLP stand for?", a: "natural language processing", id: "q4" },
+    { q: "Which library is commonly used for AI in Python?", a: "tensorflow", id: "q5" }
+  ]
+};
+
+let currentQuiz = [];
+function loadQuiz() {
+  const selected = document.getElementById("quizSelector").value;
+  const quizForm = document.getElementById("quizForm");
+  const quizQuestionsDiv = document.getElementById("quizQuestions");
+  quizQuestionsDiv.innerHTML = "";
+  if (!selected || !quizzes[selected]) {
+    quizForm.classList.add("hidden");
+    return;
+  }
+  currentQuiz = quizzes[selected];
+  currentQuiz.forEach((q, idx) => {
+    const wrapper = document.createElement("div");
+    wrapper.innerHTML = `<label>${idx + 1}. ${q.q}</label><input type="text" id="${q.id}">`;
+    quizQuestionsDiv.appendChild(wrapper);
+  });
+  quizForm.classList.remove("hidden");
+}
+
+function submitQuiz() {
+  let score = 0;
+  currentQuiz.forEach(q => {
+    const userAnswer = document.getElementById(q.id).value.trim().toLowerCase();
+    if (userAnswer === q.a.toLowerCase()) score++;
+  });
+  quizScores.push(score);
+  localStorage.setItem('quizScores', JSON.stringify(quizScores));
+  document.getElementById("quizResult").textContent = `You scored ${score}/${currentQuiz.length}`;
+}
+</script>
+
+
+    <!-- Progress -->
+    <div id="progress" class="section hidden">
+      <h2>Your Progress</h2>
+      <button onclick="showProgressPage()">📊 View Progress Chart</button>
+    </div>
+
+    <!-- Admin Dashboard -->
+    <div id="adminDashboard" class="section hidden">
+      <h2>📋 Administrator Dashboard</h2>
+      <ul>
+        <li> <a href="#">Staff details</a></li>
+        <li> <a href="#">School budget</a></li>
+        <li> <a href="#">Implementing curriculum</a></li>
+        <li> <a href="#">Student details</a> </li>
+        <li> <a href="#">Quiz remarks</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <!-- Progress Page -->
+  <div id="progressPage" class="hidden fade">
+    <h2>📈 Quiz Performance</h2>
+    <canvas id="progressChart" height="200"></canvas>
+    <button onclick="goBack()">⬅️ Back</button>
+  </div>
+
+  <script>
+    let users = [];
+    let courses = [];
+    let currentUser = null;
+    let quizScores = JSON.parse(localStorage.getItem('quizScores') || '[]');
+
+    function register() {
+      const username = document.getElementById('regUsername').value.trim();
+      const password = document.getElementById('regPassword').value.trim();
+      const role = document.getElementById('regRole').value;
+      if (!username || !password) return alert('All fields required');
+      if (users.some(u => u.username === username)) return alert('Username exists');
+      users.push({ username, password, role });
+      alert('Registered! Now login.');
+    }
+
+    function login() {
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      const user = users.find(u => u.username === username && u.password === password);
+      if (!user) return alert('Invalid credentials');
+      currentUser = user;
+      toggleView();
+    }
+
+    function toggleView() {
+      document.getElementById('auth').classList.add('hidden');
+      document.getElementById('register').classList.add('hidden');
+      if (currentUser.role === 'instructor') {
+        document.getElementById('courseCreation').classList.remove('hidden');
+        displayInstructorCourses();
+      } else if (currentUser.role === 'student') {
+        document.getElementById('courseList').classList.remove('hidden');
+        document.getElementById('assessment').classList.remove('hidden');
+        document.getElementById('progress').classList.remove('hidden');
+        displayCourses();
+      } else if (currentUser.role === 'admin') {
+        document.getElementById('adminDashboard').classList.remove('hidden');
+      }
+    }
+
+    function createCourse() {
+      const title = document.getElementById('courseTitle').value;
+      const content = document.getElementById('courseContent').value;
+      const fileInput = document.getElementById('courseFile');
+      const fileName = fileInput.files.length > 0 ? fileInput.files[0].name : 'No file';
+      if (!title || !content) return alert('Fill all fields');
+      courses.push({ title, content, fileName, instructor: currentUser.username });
+      displayInstructorCourses();
+      displayCourses();
+    }
+
+    function displayInstructorCourses() {
+      const list = document.getElementById('instructorCourses');
+      list.innerHTML = '';
+      const instructorCourses = courses.filter(c => c.instructor === currentUser.username);
+      instructorCourses.forEach((course, index) => {
+        const li = document.createElement('li');
+        li.className = 'course-item';
+        li.innerHTML = `
+          <strong>${course.title}</strong><br>
+          ${course.content}<br>
+          <em>Attachment: ${course.fileName}</em><br>
+          <button onclick="deleteCourse(${index})">Delete</button>`;
+        list.appendChild(li);
+      });
+    }
+
+    function deleteCourse(index) {
+      courses.splice(index, 1);
+      displayInstructorCourses();
+      displayCourses();
+    }
+
+    function displayCourses() {
+      const list = document.getElementById('courses');
+      list.innerHTML = '';
+      courses.forEach(course => {
+        const li = document.createElement('li');
+        li.className = 'course-item';
+        li.innerHTML = `<strong>${course.title}</strong><br>${course.content}<br><em>Attachment: ${course.fileName}</em>`;
+        list.appendChild(li);
+      });
+    }
+
+    function gradeQuiz() {
+      const score = [
+        parseInt(document.getElementById('q1').value) === 4,
+        document.getElementById('q2').value.trim().toLowerCase() === 'paris',
+        document.getElementById('q3').value === 'Python',
+        document.getElementById('q4').value.trim().toLowerCase() === 'queue',
+        document.getElementById('q5').value.trim().toLowerCase() === 'central processing unit',
+        ['o(log n)', 'log n', 'o(logn)'].includes(document.getElementById('q6').value.trim().toLowerCase())
+      ].filter(Boolean).length;
+      quizScores.push(score);
+      localStorage.setItem('quizScores', JSON.stringify(quizScores));
+      document.getElementById('quizResult').textContent = `You scored ${score}/6`;
+    }
+
+    function showProgressPage() {
+      document.getElementById('app').classList.add('hidden');
+      document.getElementById('progressPage').classList.remove('hidden');
+      const ctx = document.getElementById('progressChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: quizScores.map((_, i) => `Quiz ${i + 1}`),
+          datasets: [{
+            label: 'Quiz Score',
+            data: quizScores,
+            borderColor: '#6d4c41',
+            backgroundColor: 'rgba(215, 169, 123, 0.3)',
+            fill: true,
+            tension: 0.4
+          }]
+        },
+        options: {
+          scales: {
+            y: { beginAtZero: true, max: 6 }
+          }
+        }
+      });
+    }
+
+    function goBack() {
+      document.getElementById('progressPage').classList.add('hidden');
+      document.getElementById('app').classList.remove('hidden');
+    }
+    
+  </script>
+</body>
+</html>
